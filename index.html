@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+</head>
+
+<body>
+    <h1>My node and MongoDB Site</h1>
+
+    <p id="userName"></p>
+
+
+    <div class="container">
+        <div class="row">
+            <input type="text" class="form-control" id="name" placeholder=" Name">
+            <input type="emai" class="form-control" id="email" placeholder="@email.com">
+            <input type="number" class="form-control" id="age" placeholder="Age">
+             <input type="number" class="form-control" id="phone" placeholder="Phone Number">
+             <input type="text" class="form-control" id="gender" placeholder="Male / Female">
+             <input type="date" class="form-control" id="date" >
+             <input type="time" class="form-control" id="time">
+             <input type="text" name="" class ="form-control" id="address" placeholder="Your Address">
+            <button class="btn btn-primary" id="addPatient">Add Product</button>
+        </div>
+        <p style="color:green; display:none" id="successMessage"><small>Product Added Successfully</small></p>
+        <ul id="product_list"></ul>
+    </div>
+    <script>
+        fetch('http://localhost:4200/patients')
+            .then(res => res.json())
+            .then(data => {
+                displayPatient(data)
+            });
+        function displayPatient(data) {
+            const patientContainer = document.getElementById('product_list');
+            for (let i = 0; i < data.length; i++) {
+                const patient = data[i];
+                appendPatient(patient, patientContainer);
+
+            }
+        }
+        function appendPatient(patient, patientContainer) {
+            const item = document.createElement('li');
+            item.innerText = `${patient.name}: ${patient.email} : Age ${patient.age} : ${patient.phone} : ${patient.gender} : ${patient.address}: ${patient.date}: ${patient.time}`;
+            patientContainer.appendChild(item)
+        }
+        //Post data to the server
+        const btnAddUser = document.getElementById('addPatient');
+        btnAddUser.addEventListener('click', () => {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const age = document.getElementById('age').value;
+            const phone = document.getElementById('phone').value;
+            const gender = document.getElementById('gender').value;
+            const address = document.getElementById('address').value;
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+            const patient = { name, email, age , phone, gender, address, time, date };
+            // console.log(product)
+            fetch('http://localhost:4200/addPatients', {
+                method: 'POST',
+                body: JSON.stringify(patient),
+                headers: {
+                    "Content-type": "application/json; charset=UTF-8"
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    // console.log(data);
+                    updatePatient(data)
+
+                    document.getElementById('name').value = '';
+                    document.getElementById('email').value = '';
+                    document.getElementById('age').value = '';
+                    document.getElementById('phone').value = '';
+                    document.getElementById('gender').value = '';
+                    document.getElementById('address').value = '';
+                    document.getElementById('time').value = '';
+                    document.getElementById('date').value = '';
+
+                    // success Message 
+                    const success = document.getElementById('successMessage');
+                    success.style.display = 'block';
+                    setTimeout(() => {
+                        success.style.display = 'none';
+                    }, 5000)
+                });
+        })
+        function updatePatient(patient) {
+            const patientContainer = document.getElementById('product_list');
+            appendPatient(patient, patientContainer);
+            document.getElementById('userName').innerText = patient.name;
+        }
+    </script>
+</body>
+
+</html>
